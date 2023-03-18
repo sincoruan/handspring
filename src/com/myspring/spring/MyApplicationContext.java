@@ -36,7 +36,7 @@ public class MyApplicationContext {
                             Class<?> clazz = classLoader.loadClass(className);
                             if(clazz.isAnnotationPresent(Component.class)){
                                 BeanDefinition beanDefinition = new BeanDefinition();
-                                beanDefinition.setType(clazz.getClass());
+                                beanDefinition.setType(clazz);
 
                                 if(clazz.isAnnotationPresent(Scope.class)){
                                     beanDefinition.setScope(clazz.getAnnotation(Scope.class).value());
@@ -68,6 +68,14 @@ public class MyApplicationContext {
         }
     }
     private Object createBean(BeanDefinition beanDefinition) {
-        return null;
+        Object object;
+        try {
+            object = beanDefinition.getType().newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return object;
     }
 }
