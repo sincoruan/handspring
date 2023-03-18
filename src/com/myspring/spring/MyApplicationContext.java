@@ -87,6 +87,9 @@ public class MyApplicationContext {
             if(object instanceof BeanNameAware) {
                 ((BeanNameAware) object).setBeanName(beanName);
             }
+            if(object instanceof InitializingBean) {
+                ((InitializingBean) object).afterPropertiesSet();
+            }
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {

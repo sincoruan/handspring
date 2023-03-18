@@ -10,6 +10,5 @@ public class Main {
         System.out.println(userService1);
         System.out.println(userService2);
         userService1.test();
-
     }
 }
