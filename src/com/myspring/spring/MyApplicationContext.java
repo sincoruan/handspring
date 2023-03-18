@@ -65,15 +65,15 @@ public class MyApplicationContext {
         BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
         if("singleton".equals(beanDefinition.getScope()) || beanDefinition.getScope() == null){
             if(!beanMap.containsKey(beanName)) {
-                beanMap.put(beanName, createBean(beanDefinition));
+                beanMap.put(beanName, createBean(beanDefinition, beanName));
             }
             return beanMap.get(beanName);
         }
         else{
-            return createBean(beanDefinition);
+            return createBean(beanDefinition, beanName);
         }
     }
-    private Object createBean(BeanDefinition beanDefinition) {
+    private Object createBean(BeanDefinition beanDefinition, String beanName) {
         Class clazz = beanDefinition.getType();
         Object object;
         try {
@@ -83,6 +83,9 @@ public class MyApplicationContext {
                     field.setAccessible(true);
                     field.set(object, getBean(field.getName()));
                 }
+            }
+            if(object instanceof BeanNameAware) {
+                ((BeanNameAware) object).setBeanName(beanName);
             }
         } catch (InstantiationException e) {
             throw new RuntimeException(e);

@@ -9,6 +9,7 @@ public class Main {
         UserService userService2 = (UserService) myApplicationContext.getBean("userService");
         System.out.println(userService1);
         System.out.println(userService2);
+        userService1.test();
 
     }
 }
