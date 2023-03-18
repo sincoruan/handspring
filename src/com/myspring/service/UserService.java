@@ -6,7 +6,7 @@ import com.myspring.spring.Component;
 import com.myspring.spring.InitializingBean;
 
 @Component("userService")
-public class UserService implements BeanNameAware, InitializingBean {
+public class UserService implements BeanNameAware, InitializingBean,UserInterface {
     @Autowire
     OrderService orderService;
     String orderBeanName;
