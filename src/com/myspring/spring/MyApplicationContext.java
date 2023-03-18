@@ -6,7 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MyApplicationContext {
     private Class configClass;
-    private ConcurrentHashMap<String, BeanDefinition> concurrentHashMap = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap();
+    private ConcurrentHashMap<String, Object> beanMap = new ConcurrentHashMap();
+
     public MyApplicationContext(Class configClass) {
         this.configClass = configClass;
 
@@ -43,7 +45,7 @@ public class MyApplicationContext {
                                     beanDefinition.setScope("singleton");
                                 }
                                 String beanName = clazz.getAnnotation(Component.class).value();
-                                concurrentHashMap.put(beanName, beanDefinition);
+                                beanDefinitionMap.put(beanName, beanDefinition);
                             }
                         } catch (ClassNotFoundException e) {
                             throw new RuntimeException(e);
@@ -54,7 +56,18 @@ public class MyApplicationContext {
         }
     }
     public Object getBean(String beanName) {
-
+        BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
+        if(beanDefinition.getScope().equals("singleton")){
+            if(!beanMap.containsKey(beanName)) {
+                beanMap.put(beanName, createBean(beanDefinition));
+            }
+            return beanMap.get(beanName);
+        }
+        else{
+            return createBean(beanDefinition);
+        }
+    }
+    private Object createBean(BeanDefinition beanDefinition) {
         return null;
     }
 }
