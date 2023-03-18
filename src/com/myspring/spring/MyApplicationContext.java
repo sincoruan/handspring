@@ -5,12 +5,16 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MyApplicationContext {
     private Class configClass;
     private ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap();
     private ConcurrentHashMap<String, Object> beanMap = new ConcurrentHashMap();
+
+    private List<BeanPostProcessor> beanPostProcessorList = new ArrayList<>();
 
     public MyApplicationContext(Class configClass) {
         this.configClass = configClass;
@@ -52,8 +56,16 @@ public class MyApplicationContext {
                                     beanName = Introspector.decapitalize(clazz.getSimpleName());
                                 }
                                 beanDefinitionMap.put(beanName, beanDefinition);
+                                if(BeanPostProcessor.class.isAssignableFrom(clazz)) {
+                                    BeanPostProcessor beanPostProcessor = (BeanPostProcessor) clazz.newInstance();
+                                    beanPostProcessorList.add(beanPostProcessor);
+                                }
                             }
                         } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        } catch (InstantiationException e) {
+                            throw new RuntimeException(e);
+                        } catch (IllegalAccessException e) {
                             throw new RuntimeException(e);
                         }
                     }
@@ -89,6 +101,9 @@ public class MyApplicationContext {
             }
             if(object instanceof InitializingBean) {
                 ((InitializingBean) object).afterPropertiesSet();
+            }
+            for(BeanPostProcessor beanPostProcessor : beanPostProcessorList) {
+                beanPostProcessor.postBeanInitialize(object, beanName);
             }
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
